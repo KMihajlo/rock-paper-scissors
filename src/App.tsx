@@ -1,0 +1,12 @@
+import Game from './components/Game';
+
+export default function App() {
+  return (
+    // ...existing code...
+    <div className="app">
+      <Game />
+    </div>
+    // ...existing code...
+  );
+}
+
