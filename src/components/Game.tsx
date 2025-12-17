@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ChoiceButton from './ChoiceButton';
 import Scoreboard from './Scoreboard';
 
@@ -35,6 +35,12 @@ export default function Game() {
   const [score, setScore] = useState({ wins: 0, losses: 0, draws: 0 });
   const [isWaiting, setIsWaiting] = useState(false);
 
+  // consecutive wins + celebration state (no confetti pieces)
+  const [, setConsecutiveWins] = useState<number>(0);
+  const [showCelebration, setShowCelebration] = useState<boolean>(false);
+  const celebrationTimerRef = useRef<number | null>(null);
+  const resultTimeoutRef = useRef<number | null>(null);
+
   // Theme: 'dark' | 'light' with localStorage + prefers-color-scheme fallback
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     try {
@@ -55,7 +61,12 @@ export default function Game() {
   useEffect(() => {
     if (player == null) return;
     setIsWaiting(true);
-    const t = setTimeout(() => {
+    // clear any previous result timeout
+    if (resultTimeoutRef.current) {
+      window.clearTimeout(resultTimeoutRef.current);
+      resultTimeoutRef.current = null;
+    }
+    resultTimeoutRef.current = window.setTimeout(() => {
       const comp = getRandomChoice();
       setComputer(comp);
       const r = decide(player, comp);
@@ -67,8 +78,55 @@ export default function Game() {
       }));
       setIsWaiting(false);
     }, 600);
-    return () => clearTimeout(t);
+    return () => {
+      if (resultTimeoutRef.current) {
+        window.clearTimeout(resultTimeoutRef.current);
+        resultTimeoutRef.current = null;
+      }
+    };
   }, [player]);
+
+  // react to result changes to update consecutiveWins and trigger celebration
+  useEffect(() => {
+    if (result === 'win') {
+      setConsecutiveWins((c) => {
+        const next = c + 1;
+        // trigger celebration at 3 wins in a row
+        if (next >= 3) {
+          triggerCelebration();
+          return 0; // reset after triggering
+        }
+        return next;
+      });
+    } else if (result === 'lose' || result === 'draw') {
+      setConsecutiveWins(0);
+    }
+    // nothing to do for null
+  }, [result]);
+
+  function triggerCelebration() {
+    // show only the popup message (no confetti)
+    setShowCelebration(true);
+
+    // clear any existing celebration timer
+    if (celebrationTimerRef.current) {
+      window.clearTimeout(celebrationTimerRef.current);
+      celebrationTimerRef.current = null;
+    }
+    // hide celebration after 4s
+    celebrationTimerRef.current = window.setTimeout(() => {
+      setShowCelebration(false);
+      celebrationTimerRef.current = null;
+    }, 4000);
+  }
+
+  // cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (celebrationTimerRef.current) window.clearTimeout(celebrationTimerRef.current);
+      if (resultTimeoutRef.current) window.clearTimeout(resultTimeoutRef.current);
+    };
+  }, []);
 
   function onChoose(choice: Choice) {
     if (isWaiting) return;
@@ -145,8 +203,18 @@ export default function Game() {
         </div>
       </main>
 
+      {/* Celebration overlay (popup only) */}
+      {showCelebration && (
+        <div className="celebration-overlay" role="status" aria-live="polite">
+          <div className="celebration__message">
+            <strong>Triple Win! 🎉</strong>
+            <div className="celebration__subtitle">Three wins in a row — nice run!</div>
+          </div>
+        </div>
+      )}
+
       <footer className="game__footer">
-        <small>Built with React + TypeScript + Copilot</small>
+        <small>Built with React (TypeScript) + SCSS + Copilot</small>
         <br/>
         <small>made by: Mihajlo Kragujevski</small>
       </footer>

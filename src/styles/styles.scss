@@ -328,3 +328,51 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
   .btn { padding: 8px 12px; font-size: 14px; }
   footer { font-size: 11px; }
 }
+
+/* Celebration overlay + popup (no confetti) */
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* subtle darken backdrop when celebrating but allow pointer-events to pass through */
+.celebration-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(0,0,0,0.0), rgba(0,0,0,0.08));
+  backdrop-filter: blur(2px);
+}
+
+/* Center message */
+.celebration__message {
+  position: relative;
+  z-index: 1210;
+  background: rgba(0,0,0,0.55);
+  color: white;
+  padding: 18px 24px;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 220px;
+  box-shadow: 0 8px 40px rgba(2,6,23,0.45);
+  animation: celeb-pop 420ms cubic-bezier(.2,.9,.2,1);
+}
+.celebration__message strong { display:block; font-size: 20px; margin-bottom: 6px; }
+.celebration__subtitle { font-size: 13px; opacity: 0.95; }
+
+/* small pop animation for message */
+@keyframes celeb-pop {
+  0% { transform: scale(0.88); opacity: 0; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* make sure overlay scales well on mobile */
+@media (max-width: 480px) {
+  .celebration__message { padding: 12px 16px; min-width: 180px; font-size: 14px; }
+}
