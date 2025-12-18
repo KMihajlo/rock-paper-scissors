@@ -1,6 +1,6 @@
 // Theme tokens via CSS custom properties (dark defaults)
 :root {
-  --bg: linear-gradient(135deg, #0f172a 0%, #0b1220 100%);
+  --bg: linear-gradient(135deg, #0f172a 0%, #0f172a 100%);
   --card: rgba(255,255,255,0.04);
   --accent: #7c5cff;
   --text: #e6eef8;
@@ -20,7 +20,7 @@
 
 /* Light theme overrides */
 body.theme-light {
-  --bg: linear-gradient(180deg, #ffffff 0%, #e3e3e3 100%);
+  --bg: linear-gradient(180deg, #f8f8f8 0%, #f8f8f8 100%);
   --card: rgba(10,20,30,0.03);
   --accent: #5b6cff;
   --text: #1f2937;
