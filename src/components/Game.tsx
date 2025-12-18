@@ -351,7 +351,25 @@ export default function Game() {
       <footer className="game__footer">
         <small>Built with React (TypeScript) + SCSS + Copilot</small>
         <br/>
-        <small>made by: Mihajlo Kragujevski</small>
+        <small>made by: Mihajlo Kragujevski</small><br/>
+
+        {/* GitHub profile button-link (opens in new tab). Replace URL below. */}
+        <a
+          className="gh-btn"
+          href="https://github.com/KMihajlo/rock-paper-scissors"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open GitHub profile"
+          title="GitHub"
+        >
+          <svg className="gh-btn__icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 0a12 12 0 00-3.79 23.39c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.72.08-.72 1.2.08 1.83 1.23 1.83 1.23 1.07 1.84 2.8 1.31 3.48 1 .11-.77.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.3-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.62-2.8 5.64-5.48 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.21.7.82.58A12 12 0 0012 0z"
+            />
+          </svg>
+          <span className="gh-btn__label">GitHub Repo</span>
+        </a>
       </footer>
     </div>
   );
