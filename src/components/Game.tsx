@@ -237,7 +237,11 @@ export default function Game() {
         <div className="brand">
           <img
             className="brand__logo"
-            src={theme === 'dark' ? '/rps-favicon-light.svg' : '/rps-favicon.svg'}
+            src={
+              theme === 'dark'
+                  ? `${import.meta.env.BASE_URL}rps-favicon-light.svg`
+                  : `${import.meta.env.BASE_URL}rps-favicon.svg`
+            }
             alt=""
             aria-hidden="true"
             width={26}
