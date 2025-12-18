@@ -77,6 +77,21 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 18px;
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand__logo {
+    width: 26px;
+    height: 26px;
+    display: block;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(2,6,23,0.25);
+  }
+
   h1 {
     margin: 0;
     font-size: 20px;
@@ -376,6 +391,8 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+
+    .brand__logo { width: 24px; height: 24px; }
     h1 { font-size: 18px; }
   }
 
@@ -417,6 +434,8 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
     align-items: flex-start;
     gap: 10px;
     h1 { font-size: 18px; }
+
+    .brand__logo { width: 22px; height: 22px; }
   }
 
   .game__board {
@@ -461,6 +480,7 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
 
   .game__header {
     width: 100%;
+    .brand__logo { width: 20px; height: 20px; border-radius: 5px; }
     h1 { font-size: 16px; }
   }
 

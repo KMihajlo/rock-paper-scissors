@@ -234,7 +234,17 @@ export default function Game() {
   return (
     <div className="game">
       <header className="game__header">
-        <h1>Rock · Paper · Scissors</h1>
+        <div className="brand">
+          <img
+            className="brand__logo"
+            src={theme === 'dark' ? '/rps-favicon-light.svg' : '/rps-favicon.svg'}
+            alt=""
+            aria-hidden="true"
+            width={26}
+            height={26}
+          />
+          <h1>Rock · Paper · Scissors</h1>
+        </div>
 
         <div className="tools">
           <Scoreboard wins={score.wins} losses={score.losses} draws={score.draws} />
