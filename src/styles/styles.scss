@@ -52,7 +52,7 @@ body {
 }
 
 .app {
-  width: 920px;
+  width: 1000px;
   max-width: calc(100% - 48px);
 }
 
@@ -104,20 +104,20 @@ body {
 .game__board {
   display: grid;
   grid-template-columns: 1fr 240px;
-  gap: 18px;
   align-items: center;
+  padding-bottom: 20px;
 }
 
 .choices {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   justify-content: center;
   align-items: center;
   padding: 18px;
 }
 
 .choice {
-  --size: 120px;
+  --size: 180px;
   width: var(--size);
   height: var(--size);
   border-radius: 16px;
@@ -158,9 +158,100 @@ body {
 .center {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px; /* reduced from 12px to tighten space between duel and result */
   align-items: center;
   justify-content: center;
+}
+
+/* Duel (countdown + fists + reveal) */
+.duel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 120px;
+}
+
+/* New: block that aligns labels and emojis to same width */
+.duel__block {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* New: labels row (replaces countdown after reveal) */
+.duel__labels {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.duel__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  user-select: none;
+}
+
+/* keep existing countdown + hands/choices styles */
+.duel__countdown {
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 0 6px 24px rgba(124,92,255,0.25);
+  animation: count-pop 420ms cubic-bezier(.2,.9,.2,1);
+}
+
+.duel__hands,
+.duel__choices {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.hand {
+  font-size: 42px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 14px rgba(2,6,23,0.35));
+}
+.hand--right { transform: scaleX(-1); }
+.hand--animating { animation: fist-bob 340ms ease-in-out infinite alternate; }
+.hand--right.hand--animating { animation-delay: 80ms; }
+
+.duel__vs {
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 0 6px 24px rgba(124,92,255,0.25);
+  font-size: 14px;
+  padding: 4px 8px;
+  background: rgba(124,92,255,0.12);
+  border: 1px solid rgba(124,92,255,0.22);
+  border-radius: 999px;
+  animation: vs-pulse 900ms ease-in-out infinite;
+}
+
+.duel__emoji {
+  font-size: 40px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 14px rgba(2,6,23,0.35));
+}
+
+/* Animations */
+@keyframes fist-bob {
+  0% { transform: translateY(0) scaleX(var(--sx,1)); }
+  100% { transform: translateY(-10px) scaleX(var(--sx,1)); }
+}
+@keyframes count-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  50% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes vs-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(124,92,255,0.18); }
+  50% { transform: scale(1.06); box-shadow: 0 0 0 6px rgba(124,92,255,0.08); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(124,92,255,0.0); }
 }
 
 .hint { color: var(--muted); }
@@ -168,6 +259,7 @@ body {
 .result {
   font-weight: 600;
   padding: 10px 18px;
+  margin-bottom: 6px;
   background: rgba(255,255,255,0.02);
   border-radius: 999px;
   color: var(--text);
@@ -269,16 +361,17 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
   .game__board {
     grid-template-columns: 1fr;
     gap: 12px;
+    padding-bottom: 15px;
   }
 
   .choices {
     justify-content: center;
     padding: 12px;
-    gap: 12px;
+    gap: 16px;
   }
 
   .choice {
-    --size: 100px;
+    --size: 195px;
   }
 
   .center {
@@ -312,12 +405,13 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
 
   .choices {
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 16px;
     padding: 10px;
   }
 
   .choice {
-    --size: 86px;
+    width: 300px;
+    height: 150px;
     border-radius: 12px;
     &__emoji { font-size: 28px; }
     &__label { font-size: 12px; }
@@ -327,6 +421,15 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
   .result { font-size: 14px; padding: 8px 12px; }
   .btn { padding: 8px 12px; font-size: 14px; }
   footer { font-size: 11px; }
+
+  /* tighten center spacing further on phones */
+  .center { gap: 6px; }
+
+  /* scale duel for phones */
+  .duel { min-height: 80px; gap: 4px; }
+
+  /* labels: slightly smaller on phones */
+  .duel__label { font-size: 11px; }
 }
 
 /* Celebration overlay + popup (no confetti) */

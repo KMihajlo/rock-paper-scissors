@@ -19,23 +19,39 @@ If you used a Vite template, `index.html` already loads `/src/main.tsx` and the 
 ## What this app does (features implemented)
 - Core Rock · Paper · Scissors gameplay:
   - Player picks rock/paper/scissors.
-  - Computer selects randomly after a short delay.
+  - A duel animation runs (countdown + hands), then the computer reveals a random choice.
   - Result is computed (win / lose / draw).
   - Scoreboard tracks wins, losses, draws.
-- Modern UI with SCSS and CSS custom properties.
-- Light / dark theme toggle with animated knob and persistent selection (localStorage).
+- Modern UI with SCSS and CSS custom properties (light/dark themes).
+- Theme toggle with a modern animated knob; choice is persisted (localStorage).
 - Responsive layout for desktop, tablet and mobile (buttons scale, layout switches to single column).
-- Accessible basics: button states, aria-pressed, titles and labels.
+- Duel sequence (new):
+  - 2s countdown: “3 → 2 → 1 → GO”.
+  - Hands bob during countdown; the left hand shows the player’s chosen emoji; the right hand (computer) shuffles randomly.
+  - After “GO”, both choices are shown as emojis with “Player” and “Computer” labels above them.
+- Triple‑win celebration (new): after 3 consecutive wins, show a centered popup message for 4s (no confetti).
+- Accessible basics: buttons, aria-pressed, aria-live for duel updates, titles and labels.
+
+---
+
+## What changed recently
+- Added duel animation above the result:
+  - Countdown (3-2-1-GO) with pop animation.
+  - Player’s emoji stays fixed; only the computer’s emoji shuffles during countdown.
+  - Labels “Player” and “Computer” appear where the countdown was, once choices are revealed.
+- Tightened vertical spacing so the duel is visually centered relative to the result.
+- Light theme result colors adjusted for stronger contrast.
+- Added triple‑win popup overlay (4s) after 3 wins in a row.
 
 ---
 
 ## Project structure (important files)
 - src/main.tsx — React bootstrap (mounts App and imports styles).
 - src/App.tsx — top-level wrapper that renders `<Game />`.
-- src/components/Game.tsx — main component: game state, game flow, theme toggle, header/footer, and board layout.
+- src/components/Game.tsx — main component: game state, duel animation, theme toggle, header/footer, scoreboard, and board layout.
 - src/components/ChoiceButton.tsx — button component for each choice with selection & winner styling.
 - src/components/Scoreboard.tsx — small scoreboard UI for wins/losses/draws.
-- src/styles/styles.scss — SCSS with CSS variables, theme variables, responsive breakpoints, and toggle animation.
+- src/styles/styles.scss — SCSS with CSS variables, theme variables, duel/animation styles, and responsive breakpoints.
 - index.html — app entry (root div + module script).
 
 ---
@@ -43,93 +59,92 @@ If you used a Vite template, `index.html` already loads `/src/main.tsx` and the 
 ## Component details
 
 ### Game (src/components/Game.tsx)
-- State:
-  - `player: Choice | null` — current player choice
-  - `computer: Choice | null` — computer choice
-  - `result: Result` — 'win' | 'lose' | 'draw' | null
-  - `score: { wins, losses, draws }` — accumulated scores
-  - `isWaiting: boolean` — shows delay while computer "thinks"
-  - `theme: 'dark' | 'light'` — theme persisted in localStorage
+- State (key pieces):
+  - `player: Choice | null`, `computer: Choice | null`, `result: Result`
+  - `score: { wins, losses, draws }`
+  - `isWaiting: boolean` — duel/countdown in progress
+  - Duel: `countdown: string | null` (“3”, “2”, “1”, “GO”)
+  - Duel hands: `duelLeftEmoji`, `duelRightEmoji` (left = player’s emoji, right shuffles)
+  - Theme: `'dark' | 'light'` (persisted)
+  - Celebration: `showCelebration` + internal timers
 - Behavior:
-  - When `player` is set, a 600ms timeout simulates the computer choosing a random option, then result is computed and score updated.
-  - `toggleTheme()` flips theme, writes to localStorage, and toggles `body` classes `theme-light` / `theme-dark` so CSS custom properties adapt.
-  - Renders header (title + scoreboard + theme toggle), choices, center area (hint/result/button), footer.
+  - On player select: sets `player`, clears previous `computer`/`result`, starts a 2s duel.
+  - Countdown: 4 steps at 500ms each (“3, 2, 1, GO”).
+  - During countdown: left hand shows player’s emoji; right hand (computer) shuffles ~every 180ms.
+  - At 2s: computer choice locked, result computed, score updated, countdown removed; labels appear above choices.
+  - Consecutive wins tracked; celebrate on 3-in‑a‑row with a popup message for 4s.
+  - Theme toggle writes to localStorage and toggles `body.theme-light`/`body.theme-dark`.
+  - All timers/intervals are cleaned on reset and unmount.
 
 ### ChoiceButton (src/components/ChoiceButton.tsx)
-- Props include `choiceKey`, `label`, `emoji`, `onChoose`, and status flags.
-- Computes `isWinner` using `showResult`, `result`, and `opponent`.
-- Renders a button with classes:
-  - `.choice` base
-  - `.choice--<rock|paper|scissors>` per type
-  - `.choice--selected` when player picked it
-  - `.choice--winner` to highlight winning choice after result
-- Accessible attributes: `aria-pressed` and `title`.
+- Props include `choiceKey`, `label`, `emoji`, `onChoose`, and status flags (`isSelected`, `showResult`, `result`, `opponent`).
+- When result is known, highlights the winning choice via `choice--winner`.
 
 ### Scoreboard (src/components/Scoreboard.tsx)
-- Simple presentation of wins/losses/draws.
-- Uses themed colors (via CSS variables) for each badge.
+- Displays wins/losses/draws with themed colors.
 
 ---
 
 ## Styling & Theming (src/styles/styles.scss)
-- Uses CSS custom properties (variables) declared in `:root` with dark-theme defaults.
-- Light theme overrides are applied when `body.theme-light` is present.
-- Theme variables include `--text`, `--muted`, `--accent`, `--card`, and `--result-*` for result colors.
-- The theme toggle is a CSS-only animated control:
-  - `.theme-toggle` wrapper with `.toggle__knob` representing the knob.
-  - `.is-dark` class moves knob to the right with a smooth transform.
-  - Toggle is responsive (smaller on mobile).
-- Responsive breakpoints:
-  - At <=900px: layout turns single-column, paddings and sizes reduce.
-  - At <=480px: choices wrap, button sizes shrink, font sizes reduced.
-- Result colors (for header badges and in-game result) use `--result-win`, `--result-lose`, `--result-draw` and are overridden for the light theme to increase contrast.
+- CSS custom properties set theme tokens; light theme overrides via `body.theme-light`.
+- Result colors use `--result-win`, `--result-lose`, `--result-draw`, with stronger hues in light theme.
+- Duel styles:
+  - `.duel`, `.duel__block` (stack countdown/labels above hands/choices).
+  - `.duel__countdown` (pop animation), `.duel__hands` (bobbing hands), `.duel__choices` (revealed emojis).
+  - `.duel__labels` shows “Player” / “Computer” after reveal in the same spot used by the countdown.
+  - `.duel__vs` pulses subtly; hands/emoji have drop shadows.
+- Spacing:
+  - `.center` gap reduced; `.duel` min-height tightened for balanced space above/below the result.
+- Celebration overlay (no confetti):
+  - `.celebration-overlay` with a subtle backdrop and `.celebration__message` pop animation.
+- Responsive:
+  - Tablet: single-column layout, reduced paddings/sizes.
+  - Mobile: choices wrap, UI scales down; duel min-height and gaps reduced.
+
+---
+
+## Behavior and flow
+1. Player clicks a choice → starts the duel (2s).
+2. Countdown shows 3 → 2 → 1 → GO while the right (computer) emoji shuffles and hands bob.
+3. On “GO”, both emojis are revealed; “Player” and “Computer” labels appear above them.
+4. Result text appears below; “Play again” resets the round.
+5. After 3 consecutive wins, a popup celebration banner shows for 4s.
+
+---
+
+## Tuning knobs (where to tweak)
+- Countdown duration: `COUNTDOWN_INTERVAL_MS` and `COUNTDOWN_STEPS` (Game.tsx).
+- Shuffle speed: the interval that updates the right-hand emoji (Game.tsx).
+- Result colors: `--result-*` variables in `:root` and `body.theme-light`.
+- Duel spacing: `.center` gap, `.duel` min-height in styles.scss.
+- Celebration duration: the 4000ms timeout in `triggerCelebration()` (Game.tsx).
+
+---
+
+## Deployment
+- GitHub Pages (simplest):
+  - Ensure `gh-pages` is installed and scripts exist in `package.json`:
+    - `"predeploy": "npm run build"`, `"deploy": "gh-pages -d dist"`
+  - Run: `npm run deploy`
+  - Visit: `https://<your-username>.github.io/<repo-name>/`
+- For custom domains, set it in the repo’s Pages settings (adds a CNAME).
 
 ---
 
 ## Accessibility notes
-- Buttons use semantic `<button>` elements and `aria-pressed` to reflect toggle-like states.
-- Theme toggle has `aria-pressed` and `aria-label`.
-- Emojis are decorative and set with `aria-hidden` where appropriate, labels provide textual context.
-- Keyboard navigation works by default for native buttons.
-
----
-
-## Behavior and flow (quick)
-1. Player clicks a choice — ChoiceButton `onChoose` triggers `Game.onChoose`.
-2. Game sets `player`, clears previous `computer` & `result`, and sets `isWaiting`.
-3. After 600ms, `computer` chosen at random, `decide(player, computer)` computes result.
-4. `score` updated and `result` displayed; winning choice is highlighted via `choice--winner` class.
-5. Player can click "Play again" to reset state.
-
----
-
-## Where to change things (extension points)
-- Change delay: modify the 600ms timeout in Game.tsx.
-- Modify visuals:
-  - Edit SCSS variables in `:root` / `body.theme-light` (colors, radii, shadows).
-  - Update `.result` styles or `.choice--winner` highlight in styles.scss.
-- Replace emoji with SVG icons: update CHOICES in Game.tsx and ChoiceButton to render SVG.
-- Add sound effects: import audio and play on result update in the effect that handles result.
-- Add best-of‑N: maintain extra state (rounds, currentRound) and compute match winner when rounds complete.
-- Add animations: use CSS transitions or small libraries like Framer Motion for entrance/leave animations.
+- Buttons are native `<button>` elements with `aria-pressed`.
+- Duel area uses `aria-live="polite"` to announce changes without being intrusive.
+- Emojis are presentational; textual labels provide context.
 
 ---
 
 ## Troubleshooting
-- Blank page: ensure `index.html` includes `<div id="root"></div>` and `main.tsx` mounts App.
-- SCSS not compiling: ensure `sass` devDependency is installed (`npm i -D sass`).
-- Theme not persisting: check blocked cookies/localStorage or private mode.
-- Type errors: ensure `tsconfig` references are intact and TypeScript version fits the template.
-
----
-
-## Notes on code hygiene
-- Components are small and focused — keep that pattern when adding features.
-- Use TypeScript types for props and state to prevent regressions.
-- Keep visual constants (colors, sizes) in SCSS variables so theme overrides are easy.
+- No styles? Ensure `sass` is installed and `src/styles/styles.scss` is imported in `src/main.tsx`.
+- Timer cleanup issues (e.g., stuck countdown): verify all intervals/timeouts are cleared in the `useEffect` cleanup and `resetRound()`.
+- Theme not persisting: check localStorage access (private mode can block it).
 
 ---
 
 ## Credits
-- Built with React (TypeScript) and SCSS. UI inspiration: modern glassy card UI with CSS variables and a simple animated toggle.
+- Built with React (TypeScript) and SCSS. UI inspiration: modern glass/glassy card UI with CSS variables and a simple animated toggle.
 - Implemented collaboratively with Copilot-style guidance.
