@@ -37,7 +37,13 @@ body.theme-light {
 }
 
 * { box-sizing: border-box; }
-html,body,#root { height: 100%; }
+html,body,#root {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 body {
   margin: 0;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -52,7 +58,7 @@ body {
 }
 
 .app {
-  width: 1000px;
+  width: 1440px;
   max-width: calc(100% - 48px);
 }
 
@@ -117,7 +123,7 @@ body {
 }
 
 .choice {
-  --size: 180px;
+  --size: 270px;
   width: var(--size);
   height: var(--size);
   border-radius: 16px;
@@ -161,6 +167,7 @@ body {
   gap: 8px; /* reduced from 12px to tighten space between duel and result */
   align-items: center;
   justify-content: center;
+  margin-right: 80px;
 }
 
 /* Duel (countdown + fists + reveal) */
@@ -333,13 +340,27 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
 .theme-toggle.is-dark .icon--sun { opacity: 1; }
 .theme-toggle.is-dark .icon--moon { opacity: 0.3; }
 
-/* small size adjustments for mobile */
-@media (max-width: 480px) {
-  .theme-toggle { --w: 54px; --h: 28px; }
+/* Responsive adjustments (XL) */
+@media (max-width: 1500px) {
+  body { padding: 28px; }
+
+  .app {
+    width: 1000px;
+    max-width: calc(100% - 32px);
+  }
+
+  .choice {
+    --size: 195px;
+  }
+
+  .center {
+    order: 2;
+    margin-right: 0;
+  }
 }
 
 /* Responsive adjustments (tablet & mobile) */
-@media (max-width: 900px) {
+@media (max-width: 1040px) {
   body { padding: 28px; }
 
   .app {
@@ -379,6 +400,51 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
   }
 }
 
+@media (max-width: 769px) {
+  body { padding: 28px; }
+
+  .app {
+    width: 480px;
+    max-width: calc(100% - 32px);
+  }
+
+  .game {
+    padding: 20px;
+  }
+
+  .game__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    h1 { font-size: 18px; }
+  }
+
+  .game__board {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-bottom: 15px;
+  }
+
+  .choices {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 10px;
+  }
+
+  .choice {
+    --size: 140px;
+  }
+
+  .center {
+    order: 2;
+  }
+}
+
+/* small size adjustments for mobile */
+@media (max-width: 480px) {
+  .theme-toggle { --w: 54px; --h: 28px; }
+}
+
 @media (max-width: 480px) {
   body {
     padding: 14px;
@@ -390,7 +456,7 @@ footer { margin-top: 14px; text-align: center; color: var(--muted); font-size: 1
   }
 
   .game {
-    padding: 14px;
+    padding: 18px;
   }
 
   .game__header {
